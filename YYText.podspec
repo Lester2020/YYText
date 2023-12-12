@@ -8,7 +8,7 @@ Pod::Spec.new do |s|
   s.homepage     = 'https://github.com/ibireme/YYText'
   s.platform     = :ios, '6.0'
   s.ios.deployment_target = '6.0'
-  s.source       = { :git => 'https://github.com/ibireme/YYText.git', :tag => s.version.to_s }
+  s.source       = { :git => 'https://gitlab-vywrajy.micoworld.net/mico-ios-module/top-ios-pub/YYText', :tag => s.version.to_s }
   
   s.requires_arc = true
   s.source_files = 'YYText/**/*.{h,m}'
