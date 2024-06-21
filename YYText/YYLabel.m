@@ -394,6 +394,8 @@ static dispatch_queue_t YYLabelGetReleaseQueue() {
     _lineBreakMode = NSLineBreakByTruncatingTail;
     _innerText = [NSMutableAttributedString new];
     _innerContainer = [YYTextContainer new];
+    //MARK: 兼容约束模式RTL出现偏差的问题
+    _innerContainer.isAutoLayout = self.isAutoLayout;
     _innerContainer.truncationType = YYTextTruncationTypeEnd;
     _innerContainer.maximumNumberOfRows = _numberOfLines;
     _clearContentsBeforeAsynchronouslyDisplay = YES;
@@ -1021,9 +1023,13 @@ static dispatch_queue_t YYLabelGetReleaseQueue() {
     if (_preferredMaxLayoutWidth == 0) {
         YYTextContainer *container = [_innerContainer copy];
         container.size = YYTextContainerMaxSize;
-        
         YYTextLayout *layout = [YYTextLayout layoutWithContainer:container text:_innerText];
-        return layout.textBoundingSize;
+        //MARK: 兼容约束模式RTL出现偏差的问题
+        if (self.isAutoLayout) {
+            return layout.textBoundingRect.size;
+        } else {
+            return layout.textBoundingSize;
+        }
     }
     
     CGSize containerSize = _innerContainer.size;
@@ -1039,9 +1045,13 @@ static dispatch_queue_t YYLabelGetReleaseQueue() {
     
     YYTextContainer *container = [_innerContainer copy];
     container.size = containerSize;
-    
     YYTextLayout *layout = [YYTextLayout layoutWithContainer:container text:_innerText];
-    return layout.textBoundingSize;
+    //MARK: 兼容约束模式RTL出现偏差的问题
+    if (self.isAutoLayout) {
+        return layout.textBoundingRect.size;
+    } else {
+        return layout.textBoundingSize;
+    }
 }
 
 #pragma mark - YYTextDebugTarget

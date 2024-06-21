@@ -102,6 +102,13 @@ extern const CGSize YYTextContainerMaxSize;
 /// This modifier is applied to the lines before the layout is completed,
 /// give you a chance to modify the line position. Default is nil.
 @property (nullable, copy) id<YYTextLinePositionModifier> linePositionModifier;
+
+/**
+ 是否通过autolayout进行约束布局，补充修复RTL模式下阿语layout计算不准确的问题。
+ 默认是NO，不开启。
+ */
+@property (nonatomic, assign) BOOL isAutoLayout;
+
 @end
 
 
@@ -269,6 +276,12 @@ extern const CGSize YYTextContainerMaxSize;
 @property (nonatomic, readonly) BOOL needDrawStrikethrough;
 ///< Has border attribute
 @property (nonatomic, readonly) BOOL needDrawBorder;
+
+/**
+ 是否通过autolayout进行约束布局，补充修复RTL模式下阿语layout计算不准确的问题。
+ 默认是NO，不开启。
+ */
+@property (nonatomic, assign) BOOL isAutoLayout;
 
 
 #pragma mark - Query information from text layout

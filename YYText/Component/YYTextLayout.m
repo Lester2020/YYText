@@ -138,6 +138,8 @@ static CGColorRef YYTextGetCGColor(CGColorRef color) {
     one->_truncationType = _truncationType;
     one->_truncationToken = _truncationToken.copy;
     one->_linePositionModifier = [(NSObject *)_linePositionModifier copy];
+    //MARK: 兼容约束模式RTL出现偏差的问题
+    one->_isAutoLayout = _isAutoLayout;
     dispatch_semaphore_signal(_lock);
     return one;
 }
@@ -157,6 +159,7 @@ static CGColorRef YYTextGetCGColor(CGColorRef color) {
     [aCoder encodeInteger:_maximumNumberOfRows forKey:@"maximumNumberOfRows"];
     [aCoder encodeInteger:_truncationType forKey:@"truncationType"];
     [aCoder encodeObject:_truncationToken forKey:@"truncationToken"];
+    [aCoder encodeBool:_isAutoLayout forKey:@"isAutoLayout"];
     if ([_linePositionModifier respondsToSelector:@selector(encodeWithCoder:)] &&
         [_linePositionModifier respondsToSelector:@selector(initWithCoder:)]) {
         [aCoder encodeObject:_linePositionModifier forKey:@"linePositionModifier"];
@@ -176,6 +179,7 @@ static CGColorRef YYTextGetCGColor(CGColorRef color) {
     _truncationType = [aDecoder decodeIntegerForKey:@"truncationType"];
     _truncationToken = [aDecoder decodeObjectForKey:@"truncationToken"];
     _linePositionModifier = [aDecoder decodeObjectForKey:@"linePositionModifier"];
+    _isAutoLayout = [aDecoder decodeBoolForKey:@"isAutoLayout"];
     return self;
 }
 
@@ -422,6 +426,8 @@ dispatch_semaphore_signal(_lock);
     layout.container = container;
     layout.range = range;
     isVerticalForm = container.verticalForm;
+    // 是否通过约束布局
+    layout.isAutoLayout = container.isAutoLayout;
     
     // set cgPath and cgPathBox
     if (container.path == nil && container.exclusionPaths.count == 0) {
@@ -523,7 +529,13 @@ dispatch_semaphore_signal(_lock);
         
         // UIKit coordinate system
         CGPoint position;
-        position.x = cgPathBox.origin.x + ctLineOrigin.x;
+        
+        //MARK: 兼容约束模式RTL出现偏差的问题
+        if (layout.isAutoLayout) {
+            position.x = cgPathBox.origin.x;
+        } else {
+            position.x = cgPathBox.origin.x + ctLineOrigin.x;
+        }
         position.y = cgPathBox.size.height + cgPathBox.origin.y - ctLineOrigin.y;
         
         YYTextLine *line = [YYTextLine lineWithCTLine:ctLine position:position vertical:isVerticalForm];
