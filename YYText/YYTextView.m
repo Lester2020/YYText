@@ -24,7 +24,7 @@
 #import "UIView+YYText.h"
 
 
-static double _YYDeviceSystemVersion() {
+static double _YYDeviceSystemVersion(void) {
     static double version;
     static dispatch_once_t onceToken;
     dispatch_once(&onceToken, ^{
@@ -389,11 +389,11 @@ typedef NS_ENUM(NSUInteger, YYTextMoveDirection) {
         CGSize size = [layout textBoundingSize];
         BOOL needDraw = size.width > 1 && size.height > 1;
         if (needDraw) {
-            UIGraphicsBeginImageContextWithOptions(size, NO, 0);
-            CGContextRef context = UIGraphicsGetCurrentContext();
-            [layout drawInContext:context size:size debug:self.debugOption];
-            UIImage *image = UIGraphicsGetImageFromCurrentImageContext();
-            UIGraphicsEndImageContext();
+            UIGraphicsImageRenderer *renderer = [[UIGraphicsImageRenderer alloc] initWithSize:size];
+            UIImage *image = [renderer imageWithActions:^(UIGraphicsImageRendererContext * _Nonnull rendererContext) {
+                CGContextRef context = rendererContext.CGContext;
+                [layout drawInContext:context size:size debug:self.debugOption];
+            }];
             _placeHolderView.image = image;
             frame.size = image.size;
             if (container.isVerticalForm) {
